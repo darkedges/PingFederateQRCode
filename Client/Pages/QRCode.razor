@@ -1,9 +1,8 @@
 ﻿@page "/"
 @page "/qrcode"
-@using System.Net.WebSockets
-@using System.Text
-@using System.Threading
-@implements IDisposable
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager Navigation
+@implements IAsyncDisposable
 
 <PageTitle>QRCode</PageTitle>
 
@@ -12,54 +11,64 @@
 <SfBarcodeGenerator Width="200px" Height="150px" Type="@BarcodeType.Codabar" Value="123456789"></SfBarcodeGenerator>
 <SfQRCodeGenerator Width="200px" Height="150px"  Value="Syncfusion"></SfQRCodeGenerator>
 
-<h1>Echo test</h1>
-<h3>State: @webSocket.State</h3>
-@if (webSocket.State == WebSocketState.Open)
-{
-    <form @onsubmit="@SendMessageAsync">
-        Message: <input @bind="@message" />
-        <button type="submit">Send</button>
-    </form>
+<h1>Hub test</h1>
+<div class="form-group">
+    <label>
+        User:
+        <input @bind="userInput" />
+    </label>
+</div>
+<div class="form-group">
+    <label>
+        Message:
+        <input @bind="messageInput" size="50" />
+    </label>
+</div>
+<button @onclick="Send" disabled="@(!IsConnected)">Send</button>
 
-    <pre>@log</pre>
-}
+<hr>
+
+<ul id="messagesList">
+    @foreach (var message in messages)
+    {
+        <li>@message</li>
+    }
+</ul>
 @code {
-    CancellationTokenSource disposalTokenSource = new CancellationTokenSource();
-    ClientWebSocket webSocket = new ClientWebSocket();
-    string message = "Hello, websocket!";
-    string log = "";
+    HubConnection? hubConnection;
+    private List<string> messages = new List<string>();
+    private string? userInput;
+    private string? messageInput;
 
     protected override async Task OnInitializedAsync()
     {
-        await webSocket.ConnectAsync(new Uri("wss://localhost:7079/ws"), disposalTokenSource.Token);
-        _ = ReceiveLoop();
-    }
-
-    async Task SendMessageAsync()
-    {
-        log += $"Sending: {message}\n";
-        var dataToSend = new ArraySegment<byte>(Encoding.UTF8.GetBytes(message));
-        await webSocket.SendAsync(dataToSend, WebSocketMessageType.Text, true, disposalTokenSource.Token);
-    }
-
-    async Task ReceiveLoop()
-    {
-        var buffer = new ArraySegment<byte>(new byte[1024]);
-        while (!disposalTokenSource.IsCancellationRequested)
+        hubConnection = new HubConnectionBuilder().WithUrl(Navigation.ToAbsoluteUri("/qrcodehub")).Build();
+        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
         {
-            // Note that the received block might only be part of a larger message. If this applies in your scenario,
-            // check the received.EndOfMessage and consider buffering the blocks until that property is true.
-            // Or use a higher-level library such as SignalR.
-            var received = await webSocket.ReceiveAsync(buffer, disposalTokenSource.Token);
-            var receivedAsText = Encoding.UTF8.GetString(buffer.Array, 0, received.Count);
-            log += $"Received: {receivedAsText}\n";
-            StateHasChanged();
+            var encodedMsg = $"{user}: {message}";
+            messages.Add(encodedMsg);
+            InvokeAsync(StateHasChanged);
+        });
+        await hubConnection.StartAsync();
+    }
+
+    private async Task Send()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("SendMessage", userInput, messageInput);
         }
     }
 
-    public void Dispose()
+    public bool IsConnected =>
+      hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
     {
-        disposalTokenSource.Cancel();
-        _ = webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Bye", CancellationToken.None);
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
     }
 }
+

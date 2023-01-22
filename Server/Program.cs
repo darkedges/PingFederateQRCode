@@ -1,4 +1,6 @@
-using PingFederateQRCode.Server;
+using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.ResponseCompression;
+using PingFederateQRCode.Server.hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,7 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-//builder.Services.AddHostedService<Worker>();
+builder.Services.AddSignalR();
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" });
+});
 
 var app = builder.Build();
 
@@ -34,7 +41,12 @@ app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 
-app.UseWebSockets();
-
+app.MapHub<QRCodeHub>("/qrcodehub", options =>
+{
+    options.Transports =
+        HttpTransportType.WebSockets |
+        HttpTransportType.LongPolling;
+}
+);
 
 app.Run();
