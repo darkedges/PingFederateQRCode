@@ -1,0 +1,12 @@
+C:\Users\nirvi\source\repos\PingFederateQRCode\Shared\bin\Debug\net6.0\PingFederateQRCode.Shared.deps.json
+C:\Users\nirvi\source\repos\PingFederateQRCode\Shared\bin\Debug\net6.0\PingFederateQRCode.Shared.dll
+C:\Users\nirvi\source\repos\PingFederateQRCode\Shared\bin\Debug\net6.0\PingFederateQRCode.Shared.pdb
+C:\Users\nirvi\source\repos\PingFederateQRCode\Shared\obj\Debug\net6.0\PingFederateQRCode.Shared.csproj.AssemblyReference.cache
+C:\Users\nirvi\source\repos\PingFederateQRCode\Shared\obj\Debug\net6.0\PingFederateQRCode.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\nirvi\source\repos\PingFederateQRCode\Shared\obj\Debug\net6.0\PingFederateQRCode.Shared.AssemblyInfoInputs.cache
+C:\Users\nirvi\source\repos\PingFederateQRCode\Shared\obj\Debug\net6.0\PingFederateQRCode.Shared.AssemblyInfo.cs
+C:\Users\nirvi\source\repos\PingFederateQRCode\Shared\obj\Debug\net6.0\PingFederateQRCode.Shared.csproj.CoreCompileInputs.cache
+C:\Users\nirvi\source\repos\PingFederateQRCode\Shared\obj\Debug\net6.0\PingFederateQRCode.Shared.dll
+C:\Users\nirvi\source\repos\PingFederateQRCode\Shared\obj\Debug\net6.0\refint\PingFederateQRCode.Shared.dll
+C:\Users\nirvi\source\repos\PingFederateQRCode\Shared\obj\Debug\net6.0\PingFederateQRCode.Shared.pdb
+C:\Users\nirvi\source\repos\PingFederateQRCode\Shared\obj\Debug\net6.0\ref\PingFederateQRCode.Shared.dll
